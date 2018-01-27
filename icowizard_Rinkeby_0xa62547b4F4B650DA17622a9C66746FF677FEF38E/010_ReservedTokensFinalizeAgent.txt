@@ -1,0 +1,35 @@
+Token name: XBounty
+
+Token ticker: XBT
+
+Token decimals: 18
+
+Multisig wallet address: 0x52C3a9B0f293CaC8C1bAAbE5B62524A71211a616
+
+*****************************
+
+Crowdsale rate: 1000
+
+Crowdsale start time: 2018-01-20T17:10 (GMT + 5.5)
+
+Crowdsale end time: 2018-01-24T00:35:00 (GMT + 5.5)
+
+Compiler Version: 0.4.11
+
+Is optimization enabled?: true
+
+*****************************
+
+Finalize agent contract name: ReservedTokensFinalizeAgent
+
+Finalize agent contract address for Tier 1: 0xaf985ca9EBF44E0F2f11f09D076eC63D4D815cAC
+
+*****************************
+
+****Finalize agent contract ABI:**** 
+
+[{"constant":false,"inputs":[],"name":"finalizeCrowdsale","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"isFinalizeAgent","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"isSane","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"crowdsale","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"token","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"inputs":[{"name":"_token","type":"address"},{"name":"_crowdsale","type":"address"}],"payable":false,"type":"constructor"}]
+
+****Finalize agent contract ABI encoded constructor arguments for Tier 1:**** 
+
+000000000000000000000000a62547b4f4b650da17622a9c66746ff677fef38e000000000000000000000000ef0df49e1c63859abb12d91aa31f89eb258a9b0d

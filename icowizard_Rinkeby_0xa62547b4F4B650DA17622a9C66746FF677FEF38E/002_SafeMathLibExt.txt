@@ -1,0 +1,31 @@
+Token name: XBounty
+
+Token ticker: XBT
+
+Token decimals: 18
+
+Multisig wallet address: 0x52C3a9B0f293CaC8C1bAAbE5B62524A71211a616
+
+*****************************
+
+Crowdsale rate: 1000
+
+Crowdsale start time: 2018-01-20T17:10 (GMT + 5.5)
+
+Crowdsale end time: 2018-01-24T00:35:00 (GMT + 5.5)
+
+Compiler Version: 0.4.11
+
+Is optimization enabled?: true
+
+*****************************
+
+SafeMathLib library name: SafeMathLibExt
+
+SafeMathLib library address: 0x9030780d8a9F2486332836F559d43778bAF8fC99
+
+*****************************
+
+****SafeMathLib contract ABI:**** 
+
+[{"constant":false,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"times","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"plus","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"divides","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"minus","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"}]

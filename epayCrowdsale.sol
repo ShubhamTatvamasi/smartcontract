@@ -1,17 +1,16 @@
-
 pragma solidity ^0.4.16;
 
 interface token {
     function transfer(address receiver, uint amount) public;
 }
 
-contract Crowdsale {
+contract EPAYCrowdsale {
 
     address public beneficiary;
     uint public fundingGoal;
     uint public amountRaised;
     uint public deadline;
-    uint public price;
+    uint public price = 0.1 * 1 ether;
     token public tokenReward;
     mapping(address => uint256) public balanceOf;
     bool fundingGoalReached = false;
@@ -22,20 +21,17 @@ contract Crowdsale {
 
     /**
      * Constructor function
-     *
      * Setup the owner
      */
-    function Crowdsale(
+    function EPAYCrowdsale(
         address ifSuccessfulSendTo,
         uint fundingGoalInEthers,
         uint durationInMinutes,
-        uint etherCostOfEachToken,
         address addressOfTokenUsedAsReward
     ) public {
         beneficiary = ifSuccessfulSendTo;
         fundingGoal = fundingGoalInEthers * 1 ether;
         deadline = now + durationInMinutes * 1 minutes;
-        price = etherCostOfEachToken * 1 ether;
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
@@ -51,6 +47,7 @@ contract Crowdsale {
         amountRaised += amount;
         tokenReward.transfer(msg.sender, amount / price);
         FundTransfer(msg.sender, amount, true);
+        // beneficiary.transfer(amount); // Transfer all the ethers amount to the beneficiary
     }
 
     modifier afterDeadline() { if (now >= deadline) _; }
@@ -99,4 +96,3 @@ contract Crowdsale {
         }
     }
 }
-
