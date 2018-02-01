@@ -1,10 +1,11 @@
-pragma solidity ^0.4.16;
+pragma solidity ^0.4.18;
 
-contract EPAY {
+contract kiepayToken {
     // Public variables of the token
-    string public name = "EthPayCash";
-    string public symbol = "EPAY";
-    uint256 public totalSupply = 100000;
+    string public name = "Kiepay";
+    string public symbol = "KEP";
+    uint8 public decimals = 18;
+    uint256 public totalSupply = 3000000000000000000000000000; // 3 billion; 3,000,000,000
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
@@ -13,7 +14,7 @@ contract EPAY {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function EPAY() public {
+    function kiepayToken() public {
         balanceOf[msg.sender] = totalSupply;              // Give the creator all initial tokens
     }
 
