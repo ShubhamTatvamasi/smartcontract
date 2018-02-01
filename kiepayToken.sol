@@ -5,7 +5,7 @@ contract kiepayToken {
     string public name = "Kiepay";
     string public symbol = "KEP";
     uint8 public decimals = 18;
-    uint256 public totalSupply = 3000000000000000000000000000; // 3 billion; 3,000,000,000
+    uint256 public totalSupply = 3000000000 * 1 ether; // 3 billion; 3,000,000,000
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
