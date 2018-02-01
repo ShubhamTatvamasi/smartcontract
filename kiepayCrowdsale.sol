@@ -9,25 +9,21 @@ contract KEPCrowdsale {
     address private beneficiary;
     uint256 public amountRaised;
     address private contractAdmin;
-    
+//  price of tokens per ether
     uint256 public price = 1;
     token public tokenReward;
     mapping(address => uint256) public balanceOf;
    
     event FundTransfer(address backer, uint amount, bool isContribution);
 
-    // Constructor function 
+//  Constructor function 
     function KEPCrowdsale(address ifSuccessfulSendTo, address contractAdministrator, address addressOfTokenUsedAsReward) public {
         beneficiary = ifSuccessfulSendTo;
         contractAdmin = contractAdministrator;
         tokenReward = token(addressOfTokenUsedAsReward);
     }
 
-    /**
-     * Fall back function
-     *
-     * The function without name is the default function that is called whenever anyone sends funds to a contract
-     */
+//  function without name is the default function that is called whenever anyone sends funds to a contract
     function () payable public {
         uint amount = msg.value;
         balanceOf[msg.sender] += amount;
