@@ -42,4 +42,9 @@ contract KEPCrowdsale {
         price = _newPrice;
     }
 
+    function closeTokenSale(uint256 _tokenAmount) public {
+        require(msg.sender == contractAdmin);
+        tokenReward.transfer(contractAdmin, _tokenAmount * 1 ether);
+    }
+
 }
