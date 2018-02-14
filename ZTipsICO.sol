@@ -170,7 +170,7 @@ contract ZTipsToken is StdToken
 
     // Token manager has exclusive priveleges to call administrative
     // functions on this contract.
-    address public tokenManager = 0;
+    address private tokenManager = 0;
 
     uint public presaleSoldTokens = 0;
     uint public preICOSoldTokens = 0;
@@ -313,6 +313,7 @@ contract ZTipsToken is StdToken
     {
         //setState() method call shouldn't be entertained after ICOFinished
         require(currentState != State.ICOFinished);
+        require(uint(currentState) == uint(_nextState)- 1);
         
         currentState = _nextState;
         // enable/disable transfers
