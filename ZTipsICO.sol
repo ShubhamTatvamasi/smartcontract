@@ -1,3 +1,5 @@
+// Copyright ZTips 2018
+
 pragma solidity ^0.4.18;
 
 contract SafeMath {
@@ -64,15 +66,22 @@ contract StdToken is Token {
      mapping (address => mapping (address => uint256)) allowed;
      uint public supply = 0;
 
+     // Activity Mining
+     uint public activityCount = 0;
+     uint public activityTokenPerCount = 300;
+
      // Functions:
+     
      function transfer(address _to, uint256 _value) public returns(bool) {
           require(balances[msg.sender] >= _value);
           require(balances[_to] + _value > balances[_to]);
 
           balances[msg.sender] = safeSub(balances[msg.sender],_value);
           balances[_to] = safeAdd(balances[_to],_value);
-
+          
           Transfer(msg.sender, _to, _value);
+
+          activityCount += _value;
           return true;
      }
 
@@ -84,8 +93,10 @@ contract StdToken is Token {
           balances[_to] = safeAdd(balances[_to],_value);
           balances[_from] = safeSub(balances[_from],_value);
           allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender],_value);
-
+          
           Transfer(_from, _to, _value);
+
+          activityCount += _value;
           return true;
      }
 
@@ -98,9 +109,9 @@ contract StdToken is Token {
      }
 
      function approve(address _spender, uint256 _value) public returns (bool) {
-          // To change the approve amount you first have to reduce the addresses`
+          //  To change the approve amount you first have to reduce the addresses`
           //  allowance to zero by calling `approve(_spender, 0)` if it is not
-          //  already 0 to mitigate the race condition described here:
+          //  alr`eady 0 to mitigate the race condition described here:
           //  https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
           require((_value == 0) || (allowed[msg.sender][_spender] == 0));
 
@@ -125,8 +136,10 @@ contract ZTipsToken is StdToken
     // 880 Million Total Supply 
     uint public constant TOTAL_SUPPLY = 880000000 * (1 ether / 1 wei);
     uint public constant DEVELOPERS_BONUS = 220000000 * (1 ether / 1 wei);
-    uint public constant ACTIVITY_MINING_TOKENS = 308000000 * (1 ether / 1 wei);
     uint public constant BOUNTY_CAMPAIGNS_TOKENS = 44000000 * (1 ether / 1 wei);
+
+    // 308 Million - Activity Mining Token Supply Limit
+    uint public constant ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT = 308000000 * (1 ether / 1 wei);
 
     uint public constant PRESALE_PRICE = 21000;  // per 1 Ether
     // 13.2 Million tokens sold during presale
@@ -177,6 +190,9 @@ contract ZTipsToken is StdToken
     uint public icoSoldTokens = 0;
     uint public totalSoldTokens = 0;
 
+    uint public totalMinedTokens = 0;
+
+
 /// Modifiers:
     modifier onlyTokenManager()
     {
@@ -192,9 +208,9 @@ contract ZTipsToken is StdToken
 
 /// Events:
     event LogBuy(address indexed owner, uint value);
-    event LogBurn(address indexed owner, uint value);
 
 /// Functions:
+
     /// @dev Constructor
     /// @param _tokenManager Token manager address.
     function ZTipsToken(
@@ -212,14 +228,14 @@ contract ZTipsToken is StdToken
 
         // send team bonus immediately
         uint teamBonus = DEVELOPERS_BONUS;
-        uint activityMining = ACTIVITY_MINING_TOKENS;
+        // uint activityMining = ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT;
         uint bountyCampaigns = BOUNTY_CAMPAIGNS_TOKENS;
 
         balances[_teamTokenBonus] += teamBonus;
-        balances[_activityMiningTokens] += activityMining;
+        // balances[_activityMiningTokens] += activityMining;
         balances[_bountyCampaignsTokens] += bountyCampaigns;
 
-        supply += (teamBonus + activityMining + bountyCampaigns);
+        supply += (teamBonus + bountyCampaigns); //  + activityMining
 
         assert(PRESALE_TOKEN_SUPPLY_LIMIT==13200000 * (1 ether / 1 wei));
         assert(PREICO_TOKEN_SUPPLY_LIMIT==30800000 * (1 ether / 1 wei));
@@ -313,7 +329,7 @@ contract ZTipsToken is StdToken
     {
         //setState() method call shouldn't be entertained after ICOFinished
         require(currentState != State.ICOFinished);
-        require(uint(currentState) == uint(_nextState)- 1);
+        //require(uint(currentState) == uint(_nextState)- 1);
         
         currentState = _nextState;
         // enable/disable transfers
@@ -328,6 +344,22 @@ contract ZTipsToken is StdToken
             require(escrow.send(this.balance));
         }
     }
+
+    function withdrawActivityMiningTokens() public onlyTokenManager
+    {
+        uint newTokens = activityCount / activityTokenPerCount;
+        require(totalMinedTokens + newTokens <= ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT);
+        balances[activityMiningTokens] += newTokens;
+        supply += newTokens;
+        totalMinedTokens += newTokens;
+        activityCount = 0;
+    }
+
+    function updateActivityTokenPerCount(uint _count)  public onlyTokenManager{
+        activityTokenPerCount = _count;
+     }
+
+
 
 /// Overrides:
     function transfer(address _to, uint256 _value) public returns(bool){
