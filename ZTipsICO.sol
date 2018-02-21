@@ -138,24 +138,26 @@ contract ZTipsToken is StdToken
     uint public constant DEVELOPERS_BONUS = 220000000 * (1 ether / 1 wei);
     uint public constant BOUNTY_CAMPAIGNS_TOKENS = 44000000 * (1 ether / 1 wei);
 
-    // 308 Million - Activity Mining Token Supply Limit
-    uint public constant ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT = 308000000 * (1 ether / 1 wei);
+    // 299.2 Million - Activity Mining Token Supply Limit
+    uint public constant ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT = 299200000 * (1 ether / 1 wei);
 
     uint public constant PRESALE_PRICE = 21000;  // per 1 Ether
-    // 13.2 Million tokens sold during presale
-    uint public constant PRESALE_TOKEN_SUPPLY_LIMIT = 13200000 * (1 ether / 1 wei);
+    
+    // 17.6 Million tokens sold during presale
+    uint public constant PRESALE_TOKEN_SUPPLY_LIMIT = 17600000 * (1 ether / 1 wei);
 
     uint public constant PREICO_PRICE = 18750;  // per 1 Ether
-    // 30.8 Million tokens sold during preICO
-    uint public constant PREICO_TOKEN_SUPPLY_LIMIT = 30800000 * (1 ether / 1 wei);
+    
+    // 35.2 Million tokens sold during preICO
+    uint public constant PREICO_TOKEN_SUPPLY_LIMIT = 35200000 * (1 ether / 1 wei);
     
     uint public constant ICO_PRICE1 = 18000;     // per 1 Ether
     uint public constant ICO_PRICE2 = 16500;     // per 1 Ether
     uint public constant ICO_PRICE3 = 15750;     // per 1 Ether
     uint public constant ICO_PRICE4 = 15000;     // per 1 Ether
 
-    // 308 Million - this includes presale and pre-ICO tokens
-    uint public constant TOTAL_SOLD_TOKEN_SUPPLY_LIMIT = 308000000 * (1 ether / 1 wei);
+    // 316.8 Million - this includes presale and pre-ICO tokens
+    uint public constant TOTAL_SOLD_TOKEN_SUPPLY_LIMIT = 316800000 * (1 ether / 1 wei);
 
     enum State{
        Init,
@@ -237,9 +239,9 @@ contract ZTipsToken is StdToken
 
         supply += (teamBonus + bountyCampaigns); //  + activityMining
 
-        assert(PRESALE_TOKEN_SUPPLY_LIMIT==13200000 * (1 ether / 1 wei));
-        assert(PREICO_TOKEN_SUPPLY_LIMIT==30800000 * (1 ether / 1 wei));
-        assert(TOTAL_SOLD_TOKEN_SUPPLY_LIMIT==308000000 * (1 ether / 1 wei));
+        assert(PRESALE_TOKEN_SUPPLY_LIMIT==17600000 * (1 ether / 1 wei));
+        assert(PREICO_TOKEN_SUPPLY_LIMIT==35200000 * (1 ether / 1 wei));
+        assert(TOTAL_SOLD_TOKEN_SUPPLY_LIMIT==316800000 * (1 ether / 1 wei));
     }
 
     function buyTokens() public payable
@@ -376,6 +378,12 @@ contract ZTipsToken is StdToken
         require(enableTransfers);
         return super.approve(_spender,_value);
     }
+
+    // function approveAndCall(address _recipient, uint256 _value, bytes _extraData) {
+    //     approve(_recipient, _value);
+    //     TokenRecipient(_recipient).receiveApproval(msg.sender, _value, address(this), _extraData);
+    // }
+
 
 /// Setters/getters
     function setTokenManager(address _mgr) public onlyTokenManager
