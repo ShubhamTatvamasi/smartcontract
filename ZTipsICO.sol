@@ -1,6 +1,7 @@
 // Copyright ZTips 2018
-
 pragma solidity ^0.4.18;
+
+interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
 
 contract SafeMath {
      function safeMul(uint a, uint b) internal pure returns (uint) {
@@ -99,6 +100,14 @@ contract StdToken is Token {
           activityCount += _value;
           return true;
      }
+
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool) {
+        tokenRecipient spender = tokenRecipient(_spender);
+        if (approve(_spender, _value)) {
+            spender.receiveApproval(msg.sender, _value, this, _extraData);
+            return true;
+        }
+    }
 
      function totalSupply() public constant returns (uint256) {
           return supply;
@@ -379,11 +388,10 @@ contract ZTipsToken is StdToken
         return super.approve(_spender,_value);
     }
 
-    // function approveAndCall(address _recipient, uint256 _value, bytes _extraData) {
-    //     approve(_recipient, _value);
-    //     TokenRecipient(_recipient).receiveApproval(msg.sender, _value, address(this), _extraData);
-    // }
-
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool) {
+        require(enableTransfers);
+        return super.approveAndCall(_spender, _value, _extraData);
+    }
 
 /// Setters/getters
     function setTokenManager(address _mgr) public onlyTokenManager
