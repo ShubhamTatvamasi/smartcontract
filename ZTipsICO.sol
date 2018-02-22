@@ -147,33 +147,25 @@ contract ZTipsToken is StdToken
     uint public constant DEVELOPERS_BONUS = 220000000 * (1 ether / 1 wei);
     uint public constant BOUNTY_CAMPAIGNS_TOKENS = 44000000 * (1 ether / 1 wei);
 
-    // 299.2 Million - Activity Mining Token Supply Limit
-    uint public constant ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT = 299200000 * (1 ether / 1 wei);
+    // 308 Million - Activity Mining Token Supply Limit
+    uint public constant ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT = 308000000 * (1 ether / 1 wei);
 
-    uint public constant PRESALE_PRICE = 21000;  // per 1 Ether
+    uint public constant PREICO_PRICE = 11000;  // per 1 Ether
     
-    // 17.6 Million tokens sold during presale
-    uint public constant PRESALE_TOKEN_SUPPLY_LIMIT = 17600000 * (1 ether / 1 wei);
+    // 44 Million tokens sold during preICO
+    uint public constant PREICO_TOKEN_SUPPLY_LIMIT = 44000000 * (1 ether / 1 wei);
+    
+    uint public constant ICO_PRICE1 = 10560;     // per 1 Ether
+    uint public constant ICO_PRICE2 = 9680;     // per 1 Ether
+    uint public constant ICO_PRICE3 = 9240;     // per 1 Ether
+    uint public constant ICO_PRICE4 = 8800;     // per 1 Ether
 
-    uint public constant PREICO_PRICE = 18750;  // per 1 Ether
-    
-    // 35.2 Million tokens sold during preICO
-    uint public constant PREICO_TOKEN_SUPPLY_LIMIT = 35200000 * (1 ether / 1 wei);
-    
-    uint public constant ICO_PRICE1 = 18000;     // per 1 Ether
-    uint public constant ICO_PRICE2 = 16500;     // per 1 Ether
-    uint public constant ICO_PRICE3 = 15750;     // per 1 Ether
-    uint public constant ICO_PRICE4 = 15000;     // per 1 Ether
-
-    // 316.8 Million - this includes presale and pre-ICO tokens
-    uint public constant TOTAL_SOLD_TOKEN_SUPPLY_LIMIT = 316800000 * (1 ether / 1 wei);
+    // 308 Million - this includes pre-ICO tokens
+    uint public constant TOTAL_SOLD_TOKEN_SUPPLY_LIMIT = 308000000 * (1 ether / 1 wei);
 
     enum State{
        Init,
        Paused,
-
-       PresaleRunning,
-       PresaleFinished,
 
        PreICORunning,
        PreICOFinished,
@@ -196,7 +188,6 @@ contract ZTipsToken is StdToken
     // functions on this contract.
     address private tokenManager = 0;
 
-    uint public presaleSoldTokens = 0;
     uint public preICOSoldTokens = 0;
     uint public icoSoldTokens = 0;
     uint public totalSoldTokens = 0;
@@ -239,53 +230,30 @@ contract ZTipsToken is StdToken
 
         // send team bonus immediately
         uint teamBonus = DEVELOPERS_BONUS;
-        // uint activityMining = ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT;
         uint bountyCampaigns = BOUNTY_CAMPAIGNS_TOKENS;
 
         balances[_teamTokenBonus] += teamBonus;
-        // balances[_activityMiningTokens] += activityMining;
         balances[_bountyCampaignsTokens] += bountyCampaigns;
 
-        supply += (teamBonus + bountyCampaigns); //  + activityMining
+        supply += (teamBonus + bountyCampaigns);
 
-        assert(PRESALE_TOKEN_SUPPLY_LIMIT==17600000 * (1 ether / 1 wei));
-        assert(PREICO_TOKEN_SUPPLY_LIMIT==35200000 * (1 ether / 1 wei));
-        assert(TOTAL_SOLD_TOKEN_SUPPLY_LIMIT==316800000 * (1 ether / 1 wei));
+        assert(PREICO_TOKEN_SUPPLY_LIMIT==44000000 * (1 ether / 1 wei));
+        assert(TOTAL_SOLD_TOKEN_SUPPLY_LIMIT==308000000 * (1 ether / 1 wei));
     }
 
     function buyTokens() public payable
-    {
-        require(currentState==State.PresaleRunning || currentState==State.PreICORunning || currentState==State.ICORunning);
+    {         
+        require(currentState==State.PreICORunning || currentState==State.ICORunning);
 
-        if(currentState==State.PresaleRunning){
-            return buyTokensPresale();
-        }else if(currentState==State.PreICORunning){
+        if(currentState==State.PreICORunning){
             return buyTokensPreICO();
         }else{
             return buyTokensICO();
         }
     }
 
-    function buyTokensPresale() public payable onlyInState(State.PresaleRunning)
-    {
-        // min - 1 ETH
-        // require(msg.value >= (1 ether / 1 wei));
-        uint newTokens = msg.value * PRESALE_PRICE;
-
-        require(presaleSoldTokens + newTokens <= PRESALE_TOKEN_SUPPLY_LIMIT);
-
-        balances[msg.sender] += newTokens;
-        supply+= newTokens;
-        presaleSoldTokens+= newTokens;
-        totalSoldTokens+= newTokens;
-
-        LogBuy(msg.sender, newTokens);
-    }
-
     function buyTokensPreICO() public payable onlyInState(State.PreICORunning)
     {
-        // min - 1 ETH
-        // require(msg.value >= (1 ether / 1 wei));
         uint newTokens = msg.value * PREICO_PRICE;
 
         require(preICOSoldTokens + newTokens <= PREICO_TOKEN_SUPPLY_LIMIT);
@@ -301,8 +269,6 @@ contract ZTipsToken is StdToken
 
     function buyTokensICO() public payable onlyInState(State.ICORunning)
     {
-        // min - 0.01 ETH
-        // require(msg.value >= ((1 ether / 1 wei) / 100));
         uint newTokens = msg.value * getPrice();
 
         require(totalSoldTokens + newTokens <= TOTAL_SOLD_TOKEN_SUPPLY_LIMIT);
@@ -329,18 +295,16 @@ contract ZTipsToken is StdToken
              }
              return ICO_PRICE4;
 
-        } else if(currentState==State.PreICORunning){
+        } else {
              return PREICO_PRICE;
-        } else{
-             return PRESALE_PRICE;
-        }
+        } 
+
     }
 
     function setState(State _nextState) public onlyTokenManager
     {
         //setState() method call shouldn't be entertained after ICOFinished
         require(currentState != State.ICOFinished);
-        //require(uint(currentState) == uint(_nextState)- 1);
         
         currentState = _nextState;
         // enable/disable transfers
