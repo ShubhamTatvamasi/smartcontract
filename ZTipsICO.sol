@@ -1,7 +1,7 @@
 // Copyright ZTips 2018
 pragma solidity ^0.4.18;
 
-interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; }
+interface tokenRecipient { function receiveApproval(address _from, uint256 _value, address _token, bytes32 _extraData) external; }
 
 contract SafeMath {
      function safeMul(uint a, uint b) internal pure returns (uint) {
@@ -67,10 +67,6 @@ contract StdToken is Token {
      mapping (address => mapping (address => uint256)) allowed;
      uint public supply = 0;
 
-     // Activity Mining
-     uint public activityCount = 0;
-     uint public activityTokenPerCount = 300;
-
      // Functions:
      
      function transfer(address _to, uint256 _value) public returns(bool) {
@@ -81,8 +77,6 @@ contract StdToken is Token {
           balances[_to] = safeAdd(balances[_to],_value);
           
           Transfer(msg.sender, _to, _value);
-
-          activityCount += _value;
           return true;
      }
 
@@ -96,12 +90,10 @@ contract StdToken is Token {
           allowed[_from][msg.sender] = safeSub(allowed[_from][msg.sender],_value);
           
           Transfer(_from, _to, _value);
-
-          activityCount += _value;
           return true;
      }
 
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool) {
+    function approveAndCall(address _spender, uint256 _value, bytes32 _extraData) public returns (bool) {
         tokenRecipient spender = tokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -187,6 +179,7 @@ contract ZTipsToken is StdToken
     // Token manager has exclusive priveleges to call administrative
     // functions on this contract.
     address private tokenManager = 0;
+    address private ztipsContractAddress = 0;
 
     uint public preICOSoldTokens = 0;
     uint public icoSoldTokens = 0;
@@ -320,21 +313,42 @@ contract ZTipsToken is StdToken
         }
     }
 
-    function withdrawActivityMiningTokens() public onlyTokenManager
+
+
+    function releaseNewActivityMiningTokens() public
     {
-        uint newTokens = activityCount / activityTokenPerCount;
-        require(totalMinedTokens + newTokens <= ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT);
+        require(msg.sender == ztipsContractAddress);
+        require(totalMinedTokens < ACTIVITY_MINING_TOKEN_SUPPLY_LIMIT);
+        
+        uint newTokens;
+
+        if (totalMinedTokens < (30800000 * (1 ether / 1 wei))) {
+            newTokens = 1000 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (61600000 * (1 ether / 1 wei))) {
+            newTokens = 800 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (92400000 * (1 ether / 1 wei))) {
+            newTokens = 500 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (123200000 * (1 ether / 1 wei))) {
+            newTokens = 400 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (154000000 * (1 ether / 1 wei))) {
+            newTokens = 200 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (184800000 * (1 ether / 1 wei))) {
+            newTokens = 100 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (215600000 * (1 ether / 1 wei))) {
+            newTokens = 80 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (246400000 * (1 ether / 1 wei))) {
+            newTokens = 50 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (277200000 * (1 ether / 1 wei))) {
+            newTokens = 40 * (1 ether / 1 wei);
+        } else if (totalMinedTokens < (308000000 * (1 ether / 1 wei))) {
+            newTokens = 20 * (1 ether / 1 wei);
+        }
+
         balances[activityMiningTokens] += newTokens;
         supply += newTokens;
         totalMinedTokens += newTokens;
-        activityCount = 0;
+        
     }
-
-    function updateActivityTokenPerCount(uint _count)  public onlyTokenManager{
-        activityTokenPerCount = _count;
-     }
-
-
 
 /// Overrides:
     function transfer(address _to, uint256 _value) public returns(bool){
@@ -352,7 +366,7 @@ contract ZTipsToken is StdToken
         return super.approve(_spender,_value);
     }
 
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool) {
+    function approveAndCall(address _spender, uint256 _value, bytes32 _extraData) public returns (bool) {
         require(enableTransfers);
         return super.approveAndCall(_spender, _value, _extraData);
     }
@@ -361,6 +375,11 @@ contract ZTipsToken is StdToken
     function setTokenManager(address _mgr) public onlyTokenManager
     {
         tokenManager = _mgr;
+    }
+
+    function setZtipsContractAddress(address _ztipsContractAddress) public onlyTokenManager
+    {
+        ztipsContractAddress = _ztipsContractAddress;
     }
 
     // Default fallback function
